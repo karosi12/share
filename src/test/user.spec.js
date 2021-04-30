@@ -152,6 +152,7 @@ describe("#User", () => {
                 const search = "adeyemi"
                 const res = await request(app).get(`/api/users?q=${search}`)
                 .set('Accept', 'application/json')
+                .set('Authorization', token)
                 .expect(200);
                 expect(res.body).have.property("success");
                 expect(res.body).have.property("statusCode");
@@ -170,6 +171,7 @@ describe("#User", () => {
                 const search = "lorem"
                 const res = await request(app).get(`/api/users?q=${search}`)
                 .set('Accept', 'application/json')
+                .set('Authorization', token)
                 .expect(200);
                 expect(res.body).have.property("success");
                 expect(res.body).have.property("statusCode");
@@ -186,6 +188,7 @@ describe("#User", () => {
             try {
                 const res = await request(app).get(`/api/users`)
                 .set('Accept', 'application/json')
+                .set('Authorization', token)
                 .expect(200);
                 expect(res.body).have.property("success");
                 expect(res.body).have.property("statusCode");
