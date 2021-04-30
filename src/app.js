@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import errorhandler from 'errorhandler';
 import expressValidator from 'express-validator';
 import helmet from 'helmet';
+import SwaggerUI from 'swagger-ui-express'
+import swaggerDocument from './doc/swagger.json';
 // eslint-disable-next-line import/no-cycle
 import routes from './routes';
 
@@ -23,6 +25,8 @@ app.use(helmet());
 app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(swaggerDocument));
 
 if (!isProduction) {
   app.use(errorhandler());

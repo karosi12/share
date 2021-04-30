@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
     message: 'server is running 🚀'
   });
 });
-router.use('/', userRouter);
-router.use('/', postRouter);
+router.use('/api/', userRouter);
+router.use('/api/', postRouter);
 
 export default router;
