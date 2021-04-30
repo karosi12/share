@@ -42,26 +42,35 @@ const list = async (req, res) => {
   }
 }
 
-const upVote = async (req, res) => {
+const undoLike = async (req, res) => {
   try {
-    const {id} = req.params
-    const post = await Post.findOne({_id: id})
-    post.upvote += 1
+    const {postId} = req.body
+    const {id} = req.decoded
+    const post = await Post.findOne({_id: postId})
+    const userId = post.likeUsers.find(userId => userId == id);
+    if(!userId) return res.status(401).send(Responses.error(401, 'Unauthorised access'));
+    post.likeUsers.pull(id)
+    post.like -= 1
     await post.save()
-    return res.status(200).send(Responses.success(200, 'upvoted', post));
+    return res.status(200).send(Responses.success(200, 'undo like', post));
   } catch (error) {
+    console.error(error)
     logger.info(`Internal server error => ${error}`)
     return res.status(500).send(Responses.error(500, "Internal server error"));
   }
 }
 
-const downVote = async (req, res) => {
+const like = async (req, res) => {
   try {
-    const {id} = req.params
-    const post = await Post.findOne({_id: id})
-    post.downvote += 1
+    const {postId} = req.body
+    const {id} = req.decoded
+    const post = await Post.findOne({_id: postId})
+    const userId = post.likeUsers.find(userId => userId == id);
+    if(userId) return res.status(400).send(Responses.error(400, 'user like this post before'));
+    post.likeUsers.push(id)
+    post.like += 1
     await post.save()
-    return res.status(200).send(Responses.success(200, 'downvoted', post));
+    return res.status(200).send(Responses.success(200, 'liked', post));
   } catch (error) {
     logger.info(`Internal server error => ${error}`)
     return res.status(500).send(Responses.error(500, "Internal server error"));
@@ -121,4 +130,4 @@ const deletePost = async (req, res) => {
   }
 }
 
-export default { create, view, list, upVote, downVote, subscribe, comment, updatePost, deletePost }
+export default { create, view, list, like, undoLike, subscribe, comment, updatePost, deletePost }

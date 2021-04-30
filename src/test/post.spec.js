@@ -40,8 +40,8 @@ describe("#Post", () => {
         expect(res.body.data).have.property("_id");
         expect(res.body.data).have.property("userId");
         expect(res.body.data).have.property("subscribe");
-        expect(res.body.data).have.property("upvote");
-        expect(res.body.data).have.property("downvote");
+        expect(res.body.data).have.property("like");
+        expect(res.body.data).have.property("likeUsers");
         expect(res.body.data).have.property("comments");
         expect(res.body.data).have.property("post");
         expect(res.body.data).have.property("isDeleted");
@@ -70,8 +70,8 @@ describe("#Post", () => {
         expect(res.body.data[0]).have.property("_id");
         expect(res.body.data[0]).have.property("userId");
         expect(res.body.data[0]).have.property("subscribe");
-        expect(res.body.data[0]).have.property("upvote");
-        expect(res.body.data[0]).have.property("downvote");
+        expect(res.body.data[0]).have.property("like");
+        expect(res.body.data[0]).have.property("likeUsers");
         expect(res.body.data[0]).have.property("comments");
         expect(res.body.data[0]).have.property("post");
         expect(res.body.data[0]).have.property("isDeleted");
@@ -97,8 +97,8 @@ describe("#Post", () => {
         expect(res.body.data).have.property("_id");
         expect(res.body.data).have.property("userId");
         expect(res.body.data).have.property("subscribe");
-        expect(res.body.data).have.property("upvote");
-        expect(res.body.data).have.property("downvote");
+        expect(res.body.data).have.property("like");
+        expect(res.body.data).have.property("likeUsers");
         expect(res.body.data).have.property("comments");
         expect(res.body.data).have.property("post");
         expect(res.body.data).have.property("isDeleted");
@@ -109,17 +109,20 @@ describe("#Post", () => {
       }
     });
   });
-  describe("Vote post", () => {
-      it("#upvote question", async ()=> {
+  describe("Like a post, undo post like", () => {
+      it("#Like a post", async ()=> {
         try {
-          const res = await request(app).get(`/api/post/up-vote/${postId}`)
+          const data = {postId}
+          const res = await request(app).patch(`/api/post/like`)
           .set('Accept', 'application/json')
           .set('Authorization', token)
+          .send(data)
           .expect(200);
           expect(res.body.statusCode).to.equal(200);
           expect(res.body.success).to.equal(true);
-          expect(res.body.message).to.equal("upvoted");
-          expect(res.body.data.upvote).to.greaterThan(0)
+          expect(res.body.message).to.equal("liked");
+          expect(res.body.data.like).to.greaterThan(0)
+          expect(res.body.data.likeUsers.length).to.greaterThan(0)
           expect(res.body).have.property("success");
           expect(res.body).have.property("statusCode");
           expect(res.body).have.property("message");
@@ -127,8 +130,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("like");
+          expect(res.body.data).have.property("likeUsers");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");
@@ -138,15 +141,19 @@ describe("#Post", () => {
           throw new Error(error);
         }
       });
-      it("#downvote a post", async ()=> {
+      it("#Undo post like", async ()=> {
         try {
-          const res = await request(app).get(`/api/post/down-vote/${postId}`)
+          const data = {postId}
+          const res = await request(app).patch(`/api/post/undolike`)
           .set('Accept', 'application/json')
           .set('Authorization', token)
+          .send(data)
           .expect(200);
           expect(res.body.statusCode).to.equal(200);
           expect(res.body.success).to.equal(true);
-          expect(res.body.message).to.equal("downvoted");
+          expect(res.body.message).to.equal("undo like");
+          expect(res.body.data.like).to.eql(0)
+          expect(res.body.data.likeUsers.length).to.eql(0)
           expect(res.body).have.property("success");
           expect(res.body).have.property("statusCode");
           expect(res.body).have.property("message");
@@ -154,8 +161,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("like");
+          expect(res.body.data).have.property("likeUsers");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");
@@ -167,7 +174,7 @@ describe("#Post", () => {
       });
   });
   describe("Comment and subscribe to a post", () => {
-      it("#comment on a question", async ()=> {
+      it("#comment on a post", async ()=> {
         try {
           const data = {postId, comment: 'lorem ipsum'}
           const res = await request(app).patch(`/api/post/comment`)
@@ -186,8 +193,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("likeUsers");
+          expect(res.body.data).have.property("like");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");
@@ -216,8 +223,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("likeUsers");
+          expect(res.body.data).have.property("like");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");
@@ -237,7 +244,6 @@ describe("#Post", () => {
           .set('Authorization', token)
           .send(data)
           .expect(200);
-          // console.log(JSON.stringify(res.body));
           expect(res.body.statusCode).to.equal(200);
           expect(res.body.success).to.equal(true);
           expect(res.body.message).to.equal("post updated");
@@ -249,8 +255,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("likeUsers");
+          expect(res.body.data).have.property("like");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");
@@ -279,8 +285,8 @@ describe("#Post", () => {
           expect(res.body.data).have.property("_id");
           expect(res.body.data).have.property("userId");
           expect(res.body.data).have.property("subscribe");
-          expect(res.body.data).have.property("upvote");
-          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("likeUsers");
+          expect(res.body.data).have.property("like");
           expect(res.body.data).have.property("comments");
           expect(res.body.data).have.property("post");
           expect(res.body.data).have.property("isDeleted");

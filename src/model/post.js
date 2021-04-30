@@ -21,8 +21,11 @@ const postSchema = new mongoose.Schema(
         type: String
       }
     }],
-    upvote: { type: Number, default: 0 },
-    downvote: { type: Number, default: 0 },
+    likeUsers: [{  
+      type: Schema.Types.ObjectId,
+      ref: "users",
+    }],
+    like: { type: Number, default: 0 },
     isDeleted: {
       type: Boolean,
       default: false,
