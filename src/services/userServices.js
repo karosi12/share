@@ -1,6 +1,7 @@
 import JWT from "jsonwebtoken";
 import User from "../model/user";
 import Responses from "../helper/responses";
+import EmailService from '../services/emailService'
 const SECRET = process.env.JWT_SECRET;
 
 const getUser = async (query) => {
@@ -20,7 +21,7 @@ const loginService = async (res, user, password) => {
   return res.status(200).send(Responses.success(200, "Login successful", data));
 }
 
-const createService = async (res, user) => {
+const createService = async (res, user, host) => {
   let data = {message: 'not found', data: null};
   if(user.email) {
     data  = await getUser({email: user.email})
@@ -34,8 +35,15 @@ const createService = async (res, user) => {
   newUser.email = user.email;
   newUser.phoneNumber = user.phoneNumber;
   newUser.generateHash(user.password);
-  await newUser.save();
-  return res.status(201).send(Responses.success(201, "User created successfully", newUser));  
+  const tempAlais = process.env.SIGN_UP;
+  const userData = await newUser.save();
+  const emailData = {
+    product_name: "TalentQL",
+    user_name: user.fullName,
+    invite_link: `${host}/api/user/${userData._id}`
+  }
+  await EmailService.sendEmailWithTemplate(user.email,tempAlais,emailData);
+  return res.status(201).send(Responses.success(201, "User created successfully", userData));  
 }
 
 export default {getUser, createService, loginService}

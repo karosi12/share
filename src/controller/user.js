@@ -1,7 +1,9 @@
 import logger from '../utils/logger';
 import Responses from "../helper/responses";
 import UserService from "../services/userServices";
+import EmailService from '../services/emailService'
 import User from "../model/user";
+const SECRET = process.env.JWT_SECRET;
 
 const login = async (req, res) => {
   try {
@@ -21,13 +23,25 @@ const login = async (req, res) => {
   }
 };
 
+const find =  async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserService.getUser({_id: id})
+    if(!user.data) return res.status(400).send(Responses.error(400, user.message));
+    if(user.data) return res.status(200).send(Responses.success(200, 'Record retrieved', user.data))
+  } catch (error) {
+    logger.info(`Internal server error => ${error}`)
+    return res.status(500).send(Responses.error(500, "Internal server error"));
+  }
+}
+
 const register = async (req, res) => { 
   try {
     const  { fullName, password, email, phoneNumber } = req.body;
     if(!fullName) return res.status(400).send(Responses.error(400, "fullname is required"));    
     if(!password) return res.status(400).send(Responses.error(400, "password is required"));    
     if(email || phoneNumber) {
-      await UserService.createService(res, req.body)
+      await UserService.createService(res, req.body, req.get('host'));
     } else {
       return res.status(400).send(Responses.error(400, "email or phone number is required"));   
     }
@@ -51,4 +65,55 @@ const list = async (req, res) => {
   }
 }
 
-export default { login, list, register }
+const sendResetPasswordLink = async (req, res) => {
+  try {
+    const { email, domain } = req.body;
+    const user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(400)
+        .send(Responses.error(400, "invalid credentials, user not found"))
+    const linkcode = jwt.sign(
+      {
+        email: email,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      },
+      credential.jwtSecret
+    );
+    const link = `${domain}/change-password/${linkcode}`;
+    const tempAlais = "password-reset-20210430";
+    const data = {
+      sender: Sender,
+      reset_link: link,
+      user_email: email,
+      user_name: user.fullName,
+    };
+    const sendLink = await EmailService.sendEmailWithTemplate(email, tempAlais, data);
+    if (!sendLink) return res.status(400).send(Responses.error(400, `Reset password mail not sent ${sendLink}`))
+    return res.status(200).send(Responses.success(200,'Reset password mail sent', sendLink))
+  } catch (error) {
+    return res.status(500).send("Internal server error");
+  }
+}
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { resetcode } = req.params;
+    if (!email.includes("@"))
+      return res.status(400).send(Responses.error(400, "invalid email"));
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).send(Responses.error(400, "invalid email"));
+    user.generateHash(password);
+    await user.save();
+    return res.status(200).send(Responses.success(200,'user password reset successfully', user))
+  } catch (error) {
+    if (error.message === "jwt expired")
+      return res
+        .status(400)
+        .send(Responses.error(400, "token has expired, kindly reset password again"))
+    return res.status(500).send("Internal server error");
+  }
+}
+
+export default { login, list, register, find, resetPassword, sendResetPasswordLink }
