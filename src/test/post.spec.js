@@ -228,6 +228,69 @@ describe("#Post", () => {
         }
       });
   });
+  describe("#Update and delete a post", () => {
+      it("#update a post", async ()=> {
+        try {
+          const data = { post: 'lorem ipsum' }
+          const res = await request(app).put(`/api/post/${postId}`)
+          .set('Accept', 'application/json')
+          .set('Authorization', token)
+          .send(data)
+          .expect(200);
+          // console.log(JSON.stringify(res.body));
+          expect(res.body.statusCode).to.equal(200);
+          expect(res.body.success).to.equal(true);
+          expect(res.body.message).to.equal("post updated");
+          expect(res.body.data.comments.length).to.greaterThan(0)
+          expect(res.body).have.property("success");
+          expect(res.body).have.property("statusCode");
+          expect(res.body).have.property("message");
+          expect(res.body).have.property("data");
+          expect(res.body.data).have.property("_id");
+          expect(res.body.data).have.property("userId");
+          expect(res.body.data).have.property("subscribe");
+          expect(res.body.data).have.property("upvote");
+          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("comments");
+          expect(res.body.data).have.property("post");
+          expect(res.body.data).have.property("isDeleted");
+          expect(res.body.data).have.property("createdAt");
+          expect(res.body.data).have.property("updatedAt");
+        } catch (error) {
+          throw new Error(error);
+        }
+      });
+      it("#Delete a post", async ()=> {
+        try {
+          const data = {postId}
+          const res = await request(app).delete(`/api/post/${postId}`)
+          .set('Accept', 'application/json')
+          .set('Authorization', token)
+          .send(data)
+          .expect(200);
+          expect(res.body.statusCode).to.equal(200);
+          expect(res.body.success).to.equal(true);
+          expect(res.body.message).to.equal("post deleted");
+          expect(res.body.data.subscribe.length).to.greaterThan(0)
+          expect(res.body).have.property("success");
+          expect(res.body).have.property("statusCode");
+          expect(res.body).have.property("message");
+          expect(res.body).have.property("data");
+          expect(res.body.data).have.property("_id");
+          expect(res.body.data).have.property("userId");
+          expect(res.body.data).have.property("subscribe");
+          expect(res.body.data).have.property("upvote");
+          expect(res.body.data).have.property("downvote");
+          expect(res.body.data).have.property("comments");
+          expect(res.body.data).have.property("post");
+          expect(res.body.data).have.property("isDeleted");
+          expect(res.body.data).have.property("createdAt");
+          expect(res.body.data).have.property("updatedAt");
+        } catch (error) {
+          throw new Error(error);
+        }
+      });
+  });
 });
 const login = async (data, password) => {
   const user = await UserService.getUser({email: data.email});

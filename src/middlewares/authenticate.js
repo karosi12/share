@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
       token = req.headers.authorization;
     }
     if (!token)
-      return res.status(401).send(Response.error(400, "Unauthorised access"));
+      return res.status(401).send(Response.error(401, "Unauthorised access"));
     const authVerify = await JWT.verify(token, SECRET);
     if (!authVerify)
       return res.status(401).send(Response.error(401, "JWT token has expired"));
@@ -26,9 +26,9 @@ const authenticate = async (req, res, next) => {
       return res.status(401).send(Response.error(401, error.message));
     if (error)
       return res
-        .status(500)
+        .status(401)
         .send(
-          Response.error(500, "Something went wrong about user login token")
+          Response.error(401, "Something is wrong with user login token")
         );
   }
 };
