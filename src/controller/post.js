@@ -47,6 +47,7 @@ const undoLike = async (req, res) => {
     const {postId} = req.body
     const {id} = req.decoded
     const post = await Post.findOne({_id: postId})
+    if(!post) return res.status(400).send(Responses.error(400, 'record not found'))
     const userId = post.likeUsers.find(userId => userId == id);
     if(!userId) return res.status(401).send(Responses.error(401, 'Unauthorised access'));
     post.likeUsers.pull(id)
@@ -65,6 +66,7 @@ const like = async (req, res) => {
     const {postId} = req.body
     const {id} = req.decoded
     const post = await Post.findOne({_id: postId})
+    if(!post) return res.status(400).send(Responses.error(400, 'record not found'))
     const userId = post.likeUsers.find(userId => userId == id);
     if(userId) return res.status(400).send(Responses.error(400, 'user like this post before'));
     post.likeUsers.push(id)
@@ -82,6 +84,7 @@ const comment = async (req, res) => {
     const {id} = req.decoded
     const {comment, postId} = req.body
     const post = await Post.findOne({_id: postId})
+    if(!post) return res.status(400).send(Responses.error(400, 'record not found'))
     post.comments.push({userId: id, comment})
     await post.save()
     return res.status(200).send(Responses.success(200, 'user comment was successful', post));

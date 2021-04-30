@@ -99,7 +99,6 @@ const sendResetPasswordLink = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { resetcode } = req.params;
     if (!email.includes("@"))
       return res.status(400).send(Responses.error(400, "invalid email"));
     const user = await User.findOne({ email });
