@@ -12,4 +12,5 @@ dist/
 logs
 todo
 coverage
+package-lock.json
 
