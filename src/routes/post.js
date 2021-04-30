@@ -10,5 +10,7 @@ postRouter.get("/api/post/up-vote/:id", authenticate, postCtrl.upVote);
 postRouter.get("/api/post/down-vote/:id", authenticate, postCtrl.downVote);
 postRouter.patch("/api/post/comment", authenticate, postCtrl.comment);
 postRouter.patch("/api/post/subscribe", authenticate, postCtrl.subscribe);
+postRouter.put("/api/post/:postId", authenticate, postCtrl.updatePost);
+postRouter.delete("/api/post/:postId", authenticate, postCtrl.deletePost);
 
 export default postRouter;

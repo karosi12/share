@@ -54,6 +54,7 @@ const upVote = async (req, res) => {
     return res.status(500).send(Responses.error(500, "Internal server error"));
   }
 }
+
 const downVote = async (req, res) => {
   try {
     const {id} = req.params
@@ -95,4 +96,29 @@ const subscribe = async (req, res) => {
   }
 }
 
-export default { create, view, list, upVote, downVote, subscribe, comment }
+const updatePost =  async (req, res) => {
+  try {
+    const { post } = req.body;
+    const { postId } = req.params;
+    const findPost = await Post.findOne({_id: postId})
+    findPost.post = post;
+    await findPost.save()
+    return res.status(200).send(Responses.success(200, 'post updated', findPost));
+  } catch (error) {
+    logger.info(`Internal server error => ${error}`)
+    return res.status(500).send(Responses.error(500, "Internal server error"));
+  }
+}
+
+const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const post = await Post.findOneAndDelete({_id: postId})
+    return res.status(200).send(Responses.success(200, 'post deleted', post));
+  } catch (error) {
+    logger.info(`Internal server error => ${error}`)
+    return res.status(500).send(Responses.error(500, "Internal server error"));
+  }
+}
+
+export default { create, view, list, upVote, downVote, subscribe, comment, updatePost, deletePost }
