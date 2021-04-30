@@ -31,6 +31,7 @@ describe("#User", () => {
                 expect(res.body.data).have.property("createdAt");
                 expect(res.body.data).have.property("updatedAt");
             } catch (error) {
+                console.error(error);
                 throw new Error(error);
             }
         });
@@ -70,7 +71,7 @@ describe("#User", () => {
         });
         it("#create a user with email and/or phoneNumber", async ()=> {
             try {
-                factoryUser = Object.assign({}, factoryUser, {email: "example@gmail.com",phoneNumber: "2347012345678"});
+                factoryUser = Object.assign({}, factoryUser, {email: "xfhrxbw@solarunited.org",phoneNumber: "2347012345678"});
                 const res = await request(app).post('/api/signup')
                 .set('Accept', 'application/json')
                 .send(factoryUser)
@@ -145,12 +146,27 @@ describe("#User", () => {
                 throw new Error(error);  
             }
         });
+        it("#Change password", async () => {
+            try {
+                const userData = { password: 'password12341', email}
+                const res = await request(app).put('/api/change_password')
+                .set('Accept', 'application/json')
+                .send(userData)
+                .expect(200);
+                expect(res.body).have.property("statusCode");
+                expect(res.body).have.property("message");
+                expect(res.body.message).to.equal('user password reset successfully');
+                expect(res.body.statusCode).to.equal(200);
+                expect(res.body).have.property("data");
+            } catch (error) {
+                throw new Error(error);  
+            }
+        });
     });
     describe("Find user", () => {
         it("Get user(s)", async () => {
             try {
-                const search = "adeyemi"
-                const res = await request(app).get(`/api/users?q=${search}`)
+                const res = await request(app).get(`/api/users?q=${email}`)
                 .set('Accept', 'application/json')
                 .set('Authorization', token)
                 .expect(200);
