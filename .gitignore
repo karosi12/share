@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+
+# dotenv file
+.env
+
+.nyc_output
+.vscode
+
+dist/
+
+logs
+todo
+coverage
+
