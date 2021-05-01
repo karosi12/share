@@ -22,7 +22,7 @@
         "name": "user"
       }
   ],
-  "schemes": [
+  "schemes": [ 
       "http",
       "https"
   ],
@@ -684,6 +684,51 @@
                 },
                 "400": {
                     "description": "unable to list users",
+                    "schema": {
+                        "$ref": "#/definitions/ApiResponse400"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorised access",
+                    "schema": {
+                        "$ref": "#/definitions/ApiResponse401"
+                    }
+                },
+                "500": {
+                    "description": "Internal server error",
+                    "schema": {
+                        "$ref": "#/definitions/ApiResponse500"
+                    }
+                }
+            }
+        }
+    },
+    "/upload": {
+        "post": {
+            "tags": ["user"],
+            "summary": "Upload image",
+            "description": "Upload image",
+            "consumes":[
+                "multipart/form-data"
+             ],
+            "parameters": [
+                {
+                    "name":"picture",
+                    "in":"formData",
+                    "description":"file to upload",
+                    "required":false,
+                    "type":"file"
+                 }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Image uploaded",
+                    "schema": {
+                        "$ref": "#/definitions/ApiResponse"
+                    }
+                },
+                "400": {
+                    "description": "No file was uploaded",
                     "schema": {
                         "$ref": "#/definitions/ApiResponse400"
                     }

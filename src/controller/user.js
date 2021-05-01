@@ -2,6 +2,7 @@ import logger from '../utils/logger';
 import Responses from "../helper/responses";
 import UserService from "../services/userServices";
 import EmailService from '../services/emailService'
+import { uploadContent } from '../services/uploadService'
 import User from "../model/user";
 const SECRET = process.env.JWT_SECRET;
 
@@ -115,4 +116,22 @@ const resetPassword = async (req, res) => {
   }
 }
 
-export default { login, list, register, find, resetPassword, sendResetPasswordLink }
+const imageUpload =  async (req, res) => {
+  try {
+    const { file } = req;
+    if (!file) return res.status(400).send(Responses.error(400, "No file was uploaded"))
+    const imageExt = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!imageExt.includes(file.mimetype)) {
+      return res.status(400).send(Responses.error(400, 'Invalid Mime Type, only JPEG and PNG Format are allowed'))
+    }
+    const result = await uploadContent(file);
+    console.log("get here now => ", result.message)
+    if (!result.data) return res.status(400).send(Responses.error(400, result.message))    
+    return res.status(200).send(Responses.success(200,result.message, result.data))
+  } catch (error) {
+    logger.info(`Internal server error => ${error}`)
+    return res.status(500).send(Responses.error(500, "Internal server error"));   
+  }
+}
+
+export default { login, list, imageUpload, register, find, resetPassword, sendResetPasswordLink }
