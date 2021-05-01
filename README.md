@@ -32,6 +32,7 @@ API Endpoint:
 | POST /api/signup                                  | Register a user                     |
 | POST /api/login                                   | Login a user                        |
 | GET /api/users                                    | List all user                      |
+| POST /api/upload                                    | Upload image                      |
 | GET /api/change_password                                    | change password                      |
 | GET /api/user/\<id>                                    | View a user                      |
 | POST /api/post                       | Create post                   |
