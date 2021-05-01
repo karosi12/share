@@ -55,7 +55,6 @@ const undoLike = async (req, res) => {
     await post.save()
     return res.status(200).send(Responses.success(200, 'undo like', post));
   } catch (error) {
-    console.error(error)
     logger.info(`Internal server error => ${error}`)
     return res.status(500).send(Responses.error(500, "Internal server error"));
   }
