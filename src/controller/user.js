@@ -125,7 +125,6 @@ const imageUpload =  async (req, res) => {
       return res.status(400).send(Responses.error(400, 'Invalid Mime Type, only JPEG and PNG Format are allowed'))
     }
     const result = await uploadContent(file);
-    console.log("get here now => ", result.message)
     if (!result.data) return res.status(400).send(Responses.error(400, result.message))    
     return res.status(200).send(Responses.success(200,result.message, result.data))
   } catch (error) {
